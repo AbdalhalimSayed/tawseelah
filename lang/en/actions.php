@@ -3,6 +3,12 @@
 declare(strict_types=1);
 
 return [
+    'brand'           => 'Car brand',
+    'model'           => 'Car model',
+    'license'         => 'Car license',
+    'image-car'       => 'Car image',
+    'color-car'       => 'Car color',
+    'year-car'        => 'Car year',
     'accept'          => 'Accept',
     'action'          => 'Action',
     'actions'         => 'Actions',

@@ -3,6 +3,15 @@
 declare(strict_types=1);
 
 return [
+    'brand'           => 'براند السيارة',
+    'model'           => 'موديل السيارة',
+    'license'         => 'رخصة السيارة',
+    'image-car'       => 'صورة السيارة',
+    'year-car'        => 'سنة السيار',
+    'color-car'       => 'لون السيارة',
+    'id_card'         => 'صورة البطاقه الشخصية',
+    'user_license'    => 'صورة الرخصه الشخصية',
+    'user_image'      => 'صوره الشخصية',
     'accept'          => 'موافقة',
     'action'          => 'إجراء',
     'actions'         => 'أجراءات',

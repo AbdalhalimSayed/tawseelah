@@ -78,9 +78,7 @@
 
     <!-- Content -->
     <div class="content">
-        <p>
-            Hi, {{ $passwordReset->user->name }}
-        </p>
+
         <p>
             this Message is to verify Your email to password reset
         </p>

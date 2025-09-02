@@ -20,5 +20,8 @@ class PasswordReset extends Model
 
         return $this->belongsTo(User::class, "email", "email");
     }
+    public function driver(){
 
+        return $this->belongsTo(Driver::class, "email", "email");
+    }
 }

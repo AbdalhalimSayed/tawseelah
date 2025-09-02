@@ -9,9 +9,9 @@ use App\Http\Controllers\Api\User\AuthUserController;
 Route::group([
 
     'middleware' => 'api',
-    'prefix' => 'user/auth/'
+    'prefix' => 'auth/'
 
-], function ($router) {
+], function () {
 
     Route::post('register',                     [AuthUserController::class,'register']);
     Route::post('login',                        [AuthUserController::class,'login']);
@@ -24,7 +24,7 @@ Route::group([
 
 // Update Information And Password
 
-Route::prefix('user/update')->middleware(["auth", "verified", "api"])->group(function () {
+Route::prefix('update')->middleware(["auth", "verified", "api"])->group(function () {
 
     Route::post('password',     [UpdateController::class, "password"]);
     Route::post("image",        [UpdateController::class, "image"]);
@@ -32,7 +32,7 @@ Route::prefix('user/update')->middleware(["auth", "verified", "api"])->group(fun
 
 //Forget Password
 
-Route::prefix('user/forget-password')->group(function () {
+Route::prefix('forget-password')->group(function () {
 
     Route::post("check-email",      [ForgetPasswordController::class, "check_email"]);
     Route::post("check-otp",        [ForgetPasswordController::class, "check_otp"]);
