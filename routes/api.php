@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\AuthUserController;
 
+/**
+ * First Route Group For Authentication In App
+ */
 Route::group([
 
     'middleware' => 'api',
@@ -17,12 +20,20 @@ Route::group([
     Route::post('login',                        [AuthUserController::class,'login']);
     Route::post('logout',                       [AuthUserController::class,'logout']);
     Route::post('me',                           [AuthUserController::class,'me']);
-    Route::post("verify-email",                 [AuthUserController::class, "verify_email"]);
-    Route::post("verify-email/re-send-code",    [AuthUserController::class, "resent_code"]);
+    /**
+     * Route Group To Email Verification.
+     */
+    Route::prefix("verify-email")->group(function () {
+        Route::post("/",                 [AuthUserController::class, "verify_email"]);
+        Route::post("/re-send-code",    [AuthUserController::class, "resent_code"]);
+    });
+
 
 });
 
-// Update Information And Password
+/**
+ * Second Route Group For Change-Password & Add User Image Information
+ */
 
 Route::prefix('update')->middleware(["auth", "verified", "api"])->group(function () {
 
@@ -30,8 +41,9 @@ Route::prefix('update')->middleware(["auth", "verified", "api"])->group(function
     Route::post("image",        [UpdateController::class, "image"]);
 });
 
-//Forget Password
-
+/**
+ * Third Route Group For Forget Password
+ */
 Route::prefix('forget-password')->group(function () {
 
     Route::post("check-email",      [ForgetPasswordController::class, "check_email"]);

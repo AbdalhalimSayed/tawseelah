@@ -30,9 +30,9 @@ class DriverInformationRequest extends FormRequest
             "country"     => ["required", "string"],
             "state"       => ["required", "string"],
             "city"        => ["required", "string"],
-            "license"     => ["required", "image", "mimes:jpeg,png,jpg,gif,svg", "max:2048"],
-            "id_card"     => ["required", "image", "mimes:jpeg,png,jpg,gif,svg", "max:2048"],
-            "image"       => ["required", "image", "max:2048", "mimes:jpeg,png,jpg,gif,svg"],
+            "license"     => ["required", "image", "max:2048", "mimes:jpeg,png,jpg,gif,svg,webp"],
+            "id_card"     => ["required", "image", "max:2048", "mimes:jpeg,png,jpg,gif,svg,webp"],
+            "image"       => ["required", "image", "max:2048", "mimes:jpeg,png,jpg,gif,svg,webp"],
         ];
     }
 

@@ -23,4 +23,10 @@ return [
     'expired_code'                  => "the password reset code has expired. and send another email to reset it.",
     'carUpdated'                    => "The car's data has been successfully updated.",
     'carNotUpdated'                 => "The car's data has not been updated.",
+    'info_car'                      => 'Car data uploaded successfully.',
+    'has_car'                       => 'Driver already has a car.',
+    'update_car'                    => 'Data updated successfully.',
+    'info_driver'                   => 'Driver data uploaded successfully.',
+    'has_driver'                    => 'Driver already has a profile.',
+    'update_driver'                 => 'Data updated successfully.',
 ];

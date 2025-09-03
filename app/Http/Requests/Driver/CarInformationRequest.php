@@ -30,8 +30,8 @@ class CarInformationRequest extends FormRequest
             "model"     => ["required", "string"],
             "color"     => ["required", "string"],
             "year"      => ["required", "integer"],
-            "license"   => ["required", "image", "mimes:jpeg,png,jpg,gif,svg", "max:2048"],
-            "image"     => ["required", "mimes:jpeg,png,jpg,gif,svg", "max:2048"],
+            "license"   => ["required", "image", "mimes:jpeg,png,jpg,gif,svg,webp", "max:2048"],
+            "image"     => ["required", "image", "mimes:jpeg,png,jpg,gif,svg,webp", "max:2048"],
         ];
     }
 

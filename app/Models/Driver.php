@@ -25,6 +25,8 @@ class Driver extends Authenticatable implements JWTSubject
         return $this->hasOne(Car::class);
     }
 
+
+
     public function driver_profile(){
         return $this->hasOne(DriverProfile::class);
     }

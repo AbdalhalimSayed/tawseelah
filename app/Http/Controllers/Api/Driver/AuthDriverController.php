@@ -6,11 +6,15 @@ use App\Events\VerifyEmailEvent;
 use App\Helper\APIResponse;
 use App\Helper\OTPVerifyEmail;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Driver\CarInformationRequest;
+use App\Http\Requests\Driver\DriverInformationRequest;
 use App\Http\Requests\Driver\RegisterRequest;
 use App\Http\Requests\Driver\VerifyEmailRequest;
 use App\Http\Resources\Driver\DriverResponse;
 use App\Http\Resources\Driver\ProfileResponse;
+use App\Models\Car;
 use App\Models\Driver;
+use App\Models\DriverProfile;
 use App\Models\Otp;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -115,6 +119,92 @@ class AuthDriverController extends Controller
         event(new VerifyEmailEvent($otp));
 
         return $this->success(null, __("auth.resent"), 200);
+    }
+
+    /**
+     * Method For Driver Information
+     */
+    public function driver(DriverInformationRequest $request){
+
+        $driver = auth()->guard("driver")->user();
+
+        if(!DriverProfile::where("driver_id", $driver->id)->exists()){
+
+            $data = $request->validated();
+            $data['driver_id'] = $driver->id;
+
+            if($request->hasFile('image') && $request->file('image')->isValid()
+                && $request->hasFile("license") && $request->file("license")->isValid()
+                && $request->hasFile("image")  && $request->file("image")->isValid()
+            ){
+
+                $imageFile              = $request->file('image');
+                $imageExtension         = $imageFile->getClientOriginalExtension();
+                $imagePath              = $imageFile->storeAs("drivers/profile", "driver_" . $driver->id. "_". time() . "_image." . $imageExtension, "public");
+                $data["image"]          = $imagePath;
+
+                $licenseFile            = $request->file('license');
+                $licenseExtension       = $licenseFile->getClientOriginalExtension();
+                $licensePath            = $licenseFile->storeAs("drivers/licenses", "driver_" . $driver->id. "_". time() . "_license." .$licenseExtension, "public");
+                $data["license"]        = $licensePath;
+
+                $idCardFile             = $request->file("id_card");
+                $idCardExtension        = $idCardFile->getClientOriginalExtension();
+                $idCardPath             = $idCardFile->storeAs("drivers/id_cards", "driver_" . $driver->id. "_". time() . "_id_card." . $idCardExtension, "public");
+                $data["id_card"]        = $idCardPath;
+
+                unset($data["image"]);
+
+            }
+
+            if(DriverProfile::create($data)){
+                $driver->image = $imagePath;
+                $driver->save();
+                return $this->success(null, __("auth.info_driver"));
+            }else{
+                return $this->error(__("auth.failed"));
+            }
+
+        }else{
+
+            return $this->validationError(__("auth.has_driver"));
+
+        }
+
+    }
+
+    /**
+     * Method For Car Information
+     */
+    public function car(CarInformationRequest $request){
+        $driver = auth()->guard("driver")->user();
+        if(!Car::where("driver_id", $driver->id)->exists()){
+            $data = $request->validated();
+            $data['driver_id'] = $driver->id;
+            if($request->hasFile('image') && $request->file('image')->isValid()
+                && $request->hasFile('license') && $request->file('license')->isValid()){
+
+                $imageFile      = $request->file('image');
+                $licenseFile    = $request->file("license");
+
+                $imageExtension = $imageFile->getClientOriginalExtension();
+                $imagePath= $imageFile->storeAs("drivers/cars/images", "car_" . $driver->id . "_" . time() . "_image." . $imageExtension, "public");
+                $data['image'] = $imagePath;
+
+                $licenseExtension= $licenseFile->getClientOriginalExtension();
+                $licensePath = $licenseFile->storeAs("drivers/cars/licenses", "car_" . $driver->id . "_" . time() . "_license." .$licenseExtension, "public");
+                $data["license"] =$licensePath;
+
+            }
+
+            if(Car::create($data)){
+                return $this->success(null, __("auth.info_car"));
+            }else{
+                return $this->error(__("auth.data"));
+            }
+        }else{
+            return $this->validationError(__("auth.has_car"));
+        }
     }
 
     /**

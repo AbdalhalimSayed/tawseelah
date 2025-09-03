@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\Driver\UpdateController;
 use App\Http\Controllers\Api\Driver\ForgetPasswordController;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * First Route Group For Authentication In App
+ */
 
 Route::prefix("auth")->middleware(["api"])->group(function () {
 
@@ -12,18 +15,42 @@ Route::prefix("auth")->middleware(["api"])->group(function () {
     Route::post("login",                        [AuthDriverController::class, "login"]);
     Route::post("logout",                       [AuthDriverController::class, "logout"]);
     Route::post("me",                           [AuthDriverController::class, "me"]);
-    Route::post("verify-email",                 [AuthDriverController::class, "verify_email"]);
-    Route::post("verify-email/re-send-code",    [AuthDriverController::class, "resent_code"]);
+
+    /**
+     * Route Group To Email Verification.
+     */
+    Route::prefix("verify-email")->middleware(["auth:driver"])->group(function () {
+        Route::post("/",                 [AuthDriverController::class, "verify_email"]);
+        Route::post("/re-send-code",    [AuthDriverController::class, "resent_code"]);
+    });
+
+    /**
+     * Route For Driver Information
+     * Route For Car Information
+     */
+    Route::prefix("information")->middleware(["auth:driver"])->group(function () {
+
+        Route::post("driver", [AuthDriverController::class, "driver"]);
+        Route::post("car", [AuthDriverController::class, "car"]);
+
+    });
+
 });
 
+/**
+ * Second Route Group For Change-Password & Add Car Information & Add Driver Information
+ */
 
 Route::prefix("update")->middleware(["api", "auth:driver"])->group(function () {
 
     Route::post("change-password",                [UpdateController::class, "change_password"]);
-    Route::post("car-information",                [UpdateController::class, "car_information"]);
-    Route::post("update-profile",                 [UpdateController::class, "update_profile"] );
+    Route::post("car-information/{car}",                [UpdateController::class, "car_information"]);
+    Route::post("update-profile/{profile}",                 [UpdateController::class, "update_profile"] );
 });
 
+/**
+ * Third Route Group For Forget Password
+ */
 
 Route::prefix("forget-password")->middleware(["api"])->group(function () {
 

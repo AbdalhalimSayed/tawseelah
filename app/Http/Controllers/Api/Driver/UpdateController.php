@@ -11,6 +11,7 @@ use App\Models\Car;
 use App\Models\DriverProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UpdateController extends Controller
 {
@@ -36,74 +37,93 @@ class UpdateController extends Controller
     }
 
     /**
-     * Car Information For Drivers
+     * Update Car Information For Drivers
      */
-    public function car_information(CarInformationRequest $request)
+    public function car_information(CarInformationRequest $request,  $carId)
     {
+
+        $car = Car::find($carId);
+
         $driver = auth()->guard("driver")->user();
 
-            $data = $request->validated();
-            $data['driver_id'] = $driver->id;
-            if($request->hasFile('image') && $request->file('image')->isValid()
-                && $request->hasFile('license') && $request->file('license')->isValid()){
+        if(!$car){
+            return $this->validationError("Car Not Found");
+        }else{
+            if($driver->id == $car->driver_id){
+                $data = $request->validated();
+                $car->fill($data);
 
-                $image      = $request->file('image');
-                $license    = $request->file("license");
+                if($car->isDirty()){
+                    $imageFile      = $request->file('image');
+                    $licenseFile    = $request->file("license");
 
-                $image= $image->storeAs("drivers/cars/images", "car_" . $driver->id . "_image" . ".jpg");
-                $data['image'] = $image;
+                    $imageExtension = $imageFile->getClientOriginalExtension();
+                    $imagePath= $imageFile->storeAs("drivers/cars/images", "car_" . $driver->id . "_" . time() . "_image." . $imageExtension, "public");
+                    $data["image"] = $imagePath;
 
-                $license = $license->storeAs("drivers/cars/licenses", "car_" . $driver->id . "_license" . ".jpg");
-                $data["license"] =$license;
+                    $licenseExtension= $licenseFile->getClientOriginalExtension();
+                    $licensePath = $licenseFile->storeAs("drivers/cars/licenses", "car_" . $driver->id . "_" . time() . "_license." .$licenseExtension, "public");
+                    $data["license"] =$licensePath;
+                    $car->fill($data);
+                    $car->save();
+                    return $this->success(null, __("auth.update", ["update" => __("auth.info_car")]));
+                }
 
-            }
-
-            if(Car::create($data)){
-                return $this->success(null, __("ok"));
             }else{
-                return $this->error(__("auth.failed"));
+                return $this->validationError("Car Is Not Special for this Driver");
             }
+        }
+
+
+
 
     }
 
     /**
-     * Driver Information
+     * Update Driver Information
      */
-    public function update_profile(DriverInformationRequest $request){
+    public function update_profile(DriverInformationRequest $request, $profileId){
 
         $driver = auth()->guard("driver")->user();
 
-        $data = $request->validated();
-        $data['driver_id'] = $driver->id;
-
-        if($request->hasFile('image') && $request->file('image')->isValid()
-            && $request->hasFile("license") && $request->file("license")->isValid()
-            && $request->hasFile("image")  && $request->file("image")->isValid()
-        ){
-
-            $image              = $request->file('image');
-            $image              = $image->storeAs("drivers/profile", "driver_" . $driver->id . "_image" . ".jpg");
-            $data["image"]      = $image;
-
-            $license            = $request->file('license');
-            $license            = $license->storeAs("drivers/licenses", "driver_" . $driver->id . "_license" . ".jpg");
-            $data["license"]    = $license;
-
-            $idCard             = $request->file("id_card");
-            $idCard             = $idCard->storeAs("drivers/id_cards", "driver_" . $driver->id . "_id_card" . ".jpg");
-            $data["id_card"]     = $idCard;
-
-            unset($data["image"]);
-
+        $driverProfile=DriverProfile::find($profileId);
+        if(!$driverProfile){
+            return $this->validationError("Driver Profile Not Found");
         }
 
-        if(DriverProfile::create($data)){
-            $driver->image = $image;
-            $driver->save();
-            return $this->success(null, __("ok"));
-        }else{
-            return $this->error(__("auth.failed"));
+        if($driver->id == $driverProfile->driver_id){
+            $data = $request->validated();
+            $driverProfile->fill($data);
+            if($driverProfile->isDirty()){
+
+                $imageFile              = $request->file('image');
+                $imageExtension         = $imageFile->getClientOriginalExtension();
+                $imagePath              = $imageFile->storeAs("drivers/profile", "driver_" . $driver->id. "_". time() . "_image." . $imageExtension, "public");
+                $data["image"]          = $imagePath;
+
+                $licenseFile            = $request->file('license');
+                $licenseExtension       = $licenseFile->getClientOriginalExtension();
+                $licensePath            = $licenseFile->storeAs("drivers/licenses", "driver_" . $driver->id. "_". time() . "_license." .$licenseExtension, "public");
+                $data["license"]        = $licensePath;
+
+                $idCardFile             = $request->file("id_card");
+                $idCardExtension        = $idCardFile->getClientOriginalExtension();
+                $idCardPath             = $idCardFile->storeAs("drivers/id_cards", "driver_" . $driver->id. "_". time() . "_id_card." . $idCardExtension, "public");
+                $data["id_card"]        = $idCardPath;
+
+                unset($data["image"]);
+
+                $driverProfile->fill($data);
+                $driverProfile->save();
+                $driver->image=$imagePath;
+                $driver->save();
+                return $this->success(null, __("auth.update", ["update" => __("auth.info_driver")]));
+
+            }
         }
+
+        return $this->validationError("Driver Profile No Changed");
+
     }
 
 }
