@@ -35,6 +35,7 @@ Route::prefix("auth")->middleware(["api"])->group(function () {
 
     });
 
+
 });
 
 /**

@@ -12,6 +12,7 @@ use App\Models\DriverProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use function Pest\Laravel\delete;
 
 class UpdateController extends Controller
 {
@@ -54,16 +55,21 @@ class UpdateController extends Controller
                 $car->fill($data);
 
                 if($car->isDirty()){
-                    $imageFile      = $request->file('image');
-                    $licenseFile    = $request->file("license");
+                    Storage::delete($driver->car->image);
+                    Storage::delete($driver->car->license);
+                    $uploads = [
+                        'image' => [ 'path' => 'drivers/cars/images', 'suffix' => '_image' ],
+                        'license' => [ 'path' => 'drivers/cars/licenses', 'suffix' => '_license' ],
+                    ];
 
-                    $imageExtension = $imageFile->getClientOriginalExtension();
-                    $imagePath= $imageFile->storeAs("drivers/cars/images", "car_" . $driver->id . "_" . time() . "_image." . $imageExtension, "public");
-                    $data["image"] = $imagePath;
-
-                    $licenseExtension= $licenseFile->getClientOriginalExtension();
-                    $licensePath = $licenseFile->storeAs("drivers/cars/licenses", "car_" . $driver->id . "_" . time() . "_license." .$licenseExtension, "public");
-                    $data["license"] =$licensePath;
+                    foreach ($uploads as $key => $details) {
+                        if ($request->hasFile($key)) {
+                            $file = $request->file($key);
+                            $fileName = "driver_" . $driver->id . "_" . time() . $details['suffix'] . "." . $file->extension();
+                            $path = $file->storeAs($details['path'], $fileName);
+                            $data[$key] = $path;
+                        }
+                    }
                     $car->fill($data);
                     $car->save();
                     return $this->success(null, __("auth.update", ["update" => __("auth.info_car")]));
@@ -96,22 +102,29 @@ class UpdateController extends Controller
             $driverProfile->fill($data);
             if($driverProfile->isDirty()){
 
-                $imageFile              = $request->file('image');
-                $imageExtension         = $imageFile->getClientOriginalExtension();
-                $imagePath              = $imageFile->storeAs("drivers/profile", "driver_" . $driver->id. "_". time() . "_image." . $imageExtension, "public");
-                $data["image"]          = $imagePath;
+                /**
+                 * Upload Update Images For Driver
+                 */
+                Storage::delete($driver->image);
+                Storage::delete($driver->driver_profile->license);
+                Storage::delete($driver->driver_profile->id_card);
+                $uploads = [
+                    'image' => [ 'path' => 'drivers/profile', 'suffix' => '_image' ],
+                    'license' => [ 'path' => 'drivers/licenses', 'suffix' => '_license' ],
+                    'id_card' => [ 'path' => 'drivers/id_cards', 'suffix' => '_id_card' ],
+                ];
 
-                $licenseFile            = $request->file('license');
-                $licenseExtension       = $licenseFile->getClientOriginalExtension();
-                $licensePath            = $licenseFile->storeAs("drivers/licenses", "driver_" . $driver->id. "_". time() . "_license." .$licenseExtension, "public");
-                $data["license"]        = $licensePath;
+                foreach ($uploads as $key => $details) {
+                    if ($request->hasFile($key)) {
+                        $file = $request->file($key);
+                        $fileName = "driver_" . $driver->id . "_" . time() . $details['suffix'] . "." . $file->extension();
+                        $path = $file->storeAs($details['path'], $fileName);
+                        $data[$key] = $path;
+                    }
+                }
+                $imagePath = $data['image'];
+                unset($data['image']);
 
-                $idCardFile             = $request->file("id_card");
-                $idCardExtension        = $idCardFile->getClientOriginalExtension();
-                $idCardPath             = $idCardFile->storeAs("drivers/id_cards", "driver_" . $driver->id. "_". time() . "_id_card." . $idCardExtension, "public");
-                $data["id_card"]        = $idCardPath;
-
-                unset($data["image"]);
 
                 $driverProfile->fill($data);
                 $driverProfile->save();

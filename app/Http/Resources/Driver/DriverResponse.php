@@ -22,6 +22,7 @@ class DriverResponse extends JsonResource
             "joinAt"        => $this->created_at->format('d-m-Y'),
             "image"         => $this->image?  asset("storage/".$this->image) : asset("default/user-image.png"),
             "verify_email"  => $this->email_verified_at? true: false,
+            "status"        => $this->status,
             "token"         => $this->when(isset($this->token), $this->token),
         ];
     }

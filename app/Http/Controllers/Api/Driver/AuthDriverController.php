@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Driver;
 use App\Events\VerifyEmailEvent;
 use App\Helper\APIResponse;
 use App\Helper\OTPVerifyEmail;
+use App\Helper\UploadImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Driver\CarInformationRequest;
 use App\Http\Requests\Driver\DriverInformationRequest;
@@ -16,7 +17,12 @@ use App\Models\Car;
 use App\Models\Driver;
 use App\Models\DriverProfile;
 use App\Models\Otp;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Http\Request;
+
 
 class AuthDriverController extends Controller
 {
@@ -133,29 +139,27 @@ class AuthDriverController extends Controller
             $data = $request->validated();
             $data['driver_id'] = $driver->id;
 
-            if($request->hasFile('image') && $request->file('image')->isValid()
-                && $request->hasFile("license") && $request->file("license")->isValid()
-                && $request->hasFile("image")  && $request->file("image")->isValid()
-            ){
+            /**
+             * Upload Images For Driver
+             */
 
-                $imageFile              = $request->file('image');
-                $imageExtension         = $imageFile->getClientOriginalExtension();
-                $imagePath              = $imageFile->storeAs("drivers/profile", "driver_" . $driver->id. "_". time() . "_image." . $imageExtension, "public");
-                $data["image"]          = $imagePath;
+            $uploads = [
+                'image' => [ 'path' => 'drivers/profile', 'suffix' => '_image' ],
+                'license' => [ 'path' => 'drivers/licenses', 'suffix' => '_license' ],
+                'id_card' => [ 'path' => 'drivers/id_cards', 'suffix' => '_id_card' ],
+            ];
 
-                $licenseFile            = $request->file('license');
-                $licenseExtension       = $licenseFile->getClientOriginalExtension();
-                $licensePath            = $licenseFile->storeAs("drivers/licenses", "driver_" . $driver->id. "_". time() . "_license." .$licenseExtension, "public");
-                $data["license"]        = $licensePath;
-
-                $idCardFile             = $request->file("id_card");
-                $idCardExtension        = $idCardFile->getClientOriginalExtension();
-                $idCardPath             = $idCardFile->storeAs("drivers/id_cards", "driver_" . $driver->id. "_". time() . "_id_card." . $idCardExtension, "public");
-                $data["id_card"]        = $idCardPath;
-
-                unset($data["image"]);
-
+            foreach ($uploads as $key => $details) {
+                if ($request->hasFile($key)) {
+                    $file = $request->file($key);
+                    $fileName = "driver_" . $driver->id . "_" . time() . $details['suffix'] . "." . $file->extension();
+                    $path = $file->storeAs($details['path'], $fileName);
+                    $data[$key] = $path;
+                }
             }
+            $imagePath = $data['image'];
+            unset($data['image']);
+
 
             if(DriverProfile::create($data)){
                 $driver->image = $imagePath;
@@ -181,21 +185,21 @@ class AuthDriverController extends Controller
         if(!Car::where("driver_id", $driver->id)->exists()){
             $data = $request->validated();
             $data['driver_id'] = $driver->id;
-            if($request->hasFile('image') && $request->file('image')->isValid()
-                && $request->hasFile('license') && $request->file('license')->isValid()){
 
-                $imageFile      = $request->file('image');
-                $licenseFile    = $request->file("license");
+            $uploads = [
+                'image' => [ 'path' => 'drivers/cars/images', 'suffix' => '_image' ],
+                'license' => [ 'path' => 'drivers/cars/licenses', 'suffix' => '_license' ],
+            ];
 
-                $imageExtension = $imageFile->getClientOriginalExtension();
-                $imagePath= $imageFile->storeAs("drivers/cars/images", "car_" . $driver->id . "_" . time() . "_image." . $imageExtension, "public");
-                $data['image'] = $imagePath;
-
-                $licenseExtension= $licenseFile->getClientOriginalExtension();
-                $licensePath = $licenseFile->storeAs("drivers/cars/licenses", "car_" . $driver->id . "_" . time() . "_license." .$licenseExtension, "public");
-                $data["license"] =$licensePath;
-
+            foreach ($uploads as $key => $details) {
+                if ($request->hasFile($key)) {
+                    $file = $request->file($key);
+                    $fileName = "driver_" . $driver->id . "_" . time() . $details['suffix'] . "." . $file->extension();
+                    $path = $file->storeAs($details['path'], $fileName);
+                    $data[$key] = $path;
+                }
             }
+
 
             if(Car::create($data)){
                 return $this->success(null, __("auth.info_car"));
@@ -206,6 +210,9 @@ class AuthDriverController extends Controller
             return $this->validationError(__("auth.has_car"));
         }
     }
+
+
+
 
     /**
      * Get the token array structure.
