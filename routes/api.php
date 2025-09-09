@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\User\ForgetPasswordController;
 use App\Http\Controllers\Api\User\UpdateController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\User\ContactController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\AuthUserController;
 
@@ -51,3 +52,10 @@ Route::prefix('forget-password')->group(function () {
     Route::post("reset-password",   [ForgetPasswordController::class, "reset_password"]);
 
 });
+
+/**
+ * User Contact With Us .
+ */
+
+Route::post("contact-us", [ContactController::class, "contact_us"])
+    ->middleware(["auth:api", "verified"]);

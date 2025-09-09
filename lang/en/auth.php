@@ -29,4 +29,5 @@ return [
     'info_driver'                   => 'Driver data uploaded successfully.',
     'has_driver'                    => 'Driver already has a profile.',
     'update_driver'                 => 'Data updated successfully.',
+    "contact_us_success"            => "The message has been sent successfully. Please wait for our response.",
 ];

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Driver\AuthDriverController;
 use App\Http\Controllers\Api\Driver\UpdateController;
 use App\Http\Controllers\Api\Driver\ForgetPasswordController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Driver\ContactController;
 
 /**
  * First Route Group For Authentication In App
@@ -60,3 +61,10 @@ Route::prefix("forget-password")->middleware(["api"])->group(function () {
     Route::post("reset-password",           [ForgetPasswordController::class, "reset_password"]);
 
 });
+
+/**
+ * Driver Contact With Us .
+ */
+
+Route::post("contact-us", [ContactController::class, "contact_us"])
+    ->middleware(["auth:driver", "verified"]);
