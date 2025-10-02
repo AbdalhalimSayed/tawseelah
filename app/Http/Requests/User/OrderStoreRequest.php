@@ -4,12 +4,12 @@ namespace App\Http\Requests\User;
 
 use App\Helper\APIResponse;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
-class RegisterRequest extends FormRequest
+class OrderStoreRequest extends FormRequest
 {
-    Use APIResponse;
+    use APIResponse;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,15 +26,17 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-                "name"=>["required", "max:20", "string"],
-                "email"=>["required", "email", "unique:users,email"],
-                "password"=>["required", "min:8", "confirmed"]
+            "pickup_lat"    => ["required", "string", "max:255"],
+            "pickup_lng"    => ["required", "string", "max:255"],
+            "dropoff_lat"   => ["required", "string", "max:255"],
+            "dropoff_lng"   => ["required", "string", "max:255"],
+            "price"         => ["required", "numeric", "min:0"]
         ];
     }
 
     protected function failedValidation(Validator $validator)
     {
-        $response=$this->validationError(__("auth.data"), [$validator->errors()->keys()[0]=>$validator->errors()->first()]);
+        $response = $this->validationError(__("auth.data"), [$validator->errors()->keys()[0] => $validator->errors()->first()]);
         throw new ValidationException($validator, $response);
     }
 }

@@ -12,7 +12,7 @@ class Driver extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
-    protected $fillable=[
+    protected $fillable = [
         "name",
         "phone",
         "email",
@@ -21,13 +21,15 @@ class Driver extends Authenticatable implements JWTSubject
         "image",
     ];
 
-    public function car(){
+    public function car()
+    {
         return $this->hasOne(Car::class);
     }
 
 
 
-    public function driver_profile(){
+    public function driver_profile()
+    {
         return $this->hasOne(DriverProfile::class);
     }
 
@@ -72,5 +74,10 @@ class Driver extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }
