@@ -1,81 +1,82 @@
 # 🚖 Tawseelah
 
-**Tawseelah** هو نظام إدارة لتطبيق توصيل ونقل الركاب مبني باستخدام
-**Laravel 12** و **JWT/Sanctum** لتأمين الـ APIs.\
-يوفر النظام واجهات برمجية (APIs) لكل من **المستخدمين** و **السائقين**
-تشمل التسجيل، تسجيل الدخول، تتبع الطلبات، والتعامل مع الرحلات.
+**Tawseelah** is a ride-hailing and transportation management system
+built with **Laravel 12** using **JWT** and **Sanctum** for API
+authentication.\
+The system provides APIs for both **users** and **drivers**, including
+registration, login, password reset, order management, and ride
+tracking.
 
 ------------------------------------------------------------------------
 
-## 📦 المتطلبات
+## 📦 Requirements
 
 -   PHP \^8.2\
 -   Composer\
 -   Laravel 12\
--   MySQL أو أي قاعدة بيانات مدعومة\
--   Node.js & NPM (لتشغيل الـ frontend أو Vite لو مستخدم)
+-   MySQL or any supported database\
+-   Node.js & NPM (for frontend or Vite if used)
 
 ------------------------------------------------------------------------
 
-## ⚙️ التثبيت والتشغيل
+## ⚙️ Installation & Setup
 
 ``` bash
-# نسخ المشروع
+# Clone the project
 git clone https://github.com/AbdalhalimSayed/tawseelah.git
 cd tawseelah
 
-# تثبيت الاعتماديات
+# Install dependencies
 composer install
 npm install && npm run build
 
-# إعداد ملف البيئة
+# Setup environment file
 cp .env.example .env
 php artisan key:generate
 
-# تشغيل قواعد البيانات
+# Run migrations
 php artisan migrate
 
-# تشغيل السيرفر
+# Start the server
 php artisan serve
 ```
 
 ------------------------------------------------------------------------
 
-## 🔑 المصادقة
+## 🔑 Authentication
 
-النظام يستخدم مكتبتين للمصادقة:\
-- **Sanctum**: للتوكنز البسيطة.\
-- **JWT**: للجلسات طويلة الأمد.
-
-------------------------------------------------------------------------
-
-## 👤 Endpoints الخاصة بالمستخدمين
-
--   `POST /api/auth/register` → إنشاء حساب جديد.\
--   `POST /api/auth/login` → تسجيل الدخول.\
--   `POST /api/auth/forget-password` → إرسال رابط/OTP لاستعادة كلمة
-    المرور.\
--   `POST /api/auth/reset-password` → تعيين كلمة مرور جديدة.\
--   `GET /api/orders` → عرض الطلبات.\
--   `POST /api/orders` → إنشاء طلب جديد.\
--   `GET /api/profile` → عرض البروفايل.\
--   `PUT /api/profile` → تحديث بيانات البروفايل.
+The system uses two authentication methods:\
+- **Sanctum**: for simple API tokens.\
+- **JWT**: for long-term sessions.
 
 ------------------------------------------------------------------------
 
-## 🚗 Endpoints الخاصة بالسائقين
+## 👤 User Endpoints
 
--   `POST /api/driver/register` → إنشاء حساب سائق جديد.\
--   `POST /api/driver/login` → تسجيل الدخول.\
--   `GET /api/driver/orders` → عرض الطلبات المتاحة.\
--   `POST /api/driver/orders/{id}/accept` → قبول طلب.\
--   `POST /api/driver/orders/{id}/complete` → إنهاء رحلة.\
--   `GET /api/driver/profile` → عرض ملف السائق.\
--   `PUT /api/driver/profile` → تعديل ملف السائق.
+-   `POST /api/auth/register` → Register a new user.\
+-   `POST /api/auth/login` → User login.\
+-   `POST /api/auth/forget-password` → Send reset link/OTP.\
+-   `POST /api/auth/reset-password` → Reset user password.\
+-   `GET /api/orders` → List all user orders.\
+-   `POST /api/orders` → Create a new order.\
+-   `GET /api/profile` → Get user profile.\
+-   `PUT /api/profile` → Update user profile.
 
 ------------------------------------------------------------------------
 
-## 🧪 الاختبارات
+## 🚗 Driver Endpoints
+
+-   `POST /api/driver/register` → Register a new driver.\
+-   `POST /api/driver/login` → Driver login.\
+-   `GET /api/driver/orders` → View available orders.\
+-   `POST /api/driver/orders/{id}/accept` → Accept an order.\
+-   `POST /api/driver/orders/{id}/complete` → Complete a ride.\
+-   `GET /api/driver/profile` → View driver profile.\
+-   `PUT /api/driver/profile` → Update driver profile.
+
+------------------------------------------------------------------------
+
+## 🧪 Testing
 
 ``` bash
 php artisan test
@@ -83,6 +84,6 @@ php artisan test
 
 ------------------------------------------------------------------------
 
-## 📄 الترخيص
+## 📄 License
 
-هذا المشروع مرخّص تحت رخصة [MIT](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
