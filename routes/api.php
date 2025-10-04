@@ -62,6 +62,6 @@ Route::post("contact-us", [ContactController::class, "contact_us"])
 Route::middleware('auth:api')->prefix('orders')->group(function () {
     Route::post('/',              [OrderController::class, 'store']);
     Route::get('/',               [OrderController::class, 'index']);
-    Route::get('/{id}',          [OrderController::class, 'show']);
-    Route::put('/{id}/cancel',   [OrderController::class, 'cancel']);
+    Route::get('/{order}',          [OrderController::class, 'show']);
+    Route::put('/{order}/cancel',   [OrderController::class, 'cancel']);
 });

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Driver\UpdateController;
 use App\Http\Controllers\Api\Driver\ForgetPasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Driver\ContactController;
+use App\Http\Controllers\Api\Driver\DriverOrderController;
 
 /**
  * First Route Group For Authentication In App
@@ -33,10 +34,7 @@ Route::prefix("auth")->middleware(["api"])->group(function () {
 
         Route::post("driver", [AuthDriverController::class, "driver"]);
         Route::post("car", [AuthDriverController::class, "car"]);
-
     });
-
-
 });
 
 /**
@@ -47,7 +45,7 @@ Route::prefix("update")->middleware(["api", "auth:driver"])->group(function () {
 
     Route::post("change-password",                [UpdateController::class, "change_password"]);
     Route::post("car-information/{car}",                [UpdateController::class, "car_information"]);
-    Route::post("update-profile/{profile}",                 [UpdateController::class, "update_profile"] );
+    Route::post("update-profile/{profile}",                 [UpdateController::class, "update_profile"]);
 });
 
 /**
@@ -59,7 +57,6 @@ Route::prefix("forget-password")->middleware(["api"])->group(function () {
     Route::post("check-email",              [ForgetPasswordController::class, "check_email"]);
     Route::post("check-otp",               [ForgetPasswordController::class, "check_otp"]);
     Route::post("reset-password",           [ForgetPasswordController::class, "reset_password"]);
-
 });
 
 /**
@@ -68,3 +65,10 @@ Route::prefix("forget-password")->middleware(["api"])->group(function () {
 
 Route::post("contact-us", [ContactController::class, "contact_us"])
     ->middleware(["auth:driver", "verified"]);
+
+Route::middleware('auth:driver')->group(function () {
+    Route::get('/orders/pending', [DriverOrderController::class, 'pending']);
+    Route::put('/orders/{order}/accept', [DriverOrderController::class, 'accept']);
+    Route::put('/orders/{order}/status', [DriverOrderController::class, 'updateStatus']);
+    Route::get('/orders', [DriverOrderController::class, 'index']);
+});
